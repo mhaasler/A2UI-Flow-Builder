@@ -1,0 +1,238 @@
+{
+    "$schema": "https://a2ui.org/schema/v9/spec.json",
+    "bundleVersion": "9.0.0",
+    "generatedAt": "2026-03-15T12:00:00Z",
+    "compat": {
+        "minRunner": "0.1.0",
+        "minConfigurator": "0.1.0"
+    },
+    "profileSchemas": {
+        "connection_profile": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "title": "Connection Profile",
+            "type": "object",
+            "description": "Schema for connection profiles",
+            "additionalProperties": true
+        },
+        "reference_data_profile": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "title": "Reference Data Profile",
+            "type": "object",
+            "description": "Schema for reference data profiles",
+            "additionalProperties": true
+        },
+        "workflow_profile": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "title": "Workflow Profile",
+            "type": "object",
+            "description": "Schema for workflow profiles",
+            "additionalProperties": true
+        }
+    },
+    "pluginDescriptors": [
+        {
+            "id": "connection.shopware.app_oauth",
+            "kind": "connection",
+            "displayName": "Shopware App OAuth",
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "clientId": {
+                        "type": "string"
+                    },
+                    "clientSecret": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "clientId",
+                    "clientSecret"
+                ]
+            },
+            "capabilities": {
+                "authSchemas": [
+                    "oauth_client_credentials"
+                ],
+                "supportsCredentialEncryption": true
+            },
+            "uiHints": {}
+        },
+        {
+            "id": "source.shopware.api",
+            "kind": "source",
+            "displayName": "Shopware API Source (Ingestion)",
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "connectionProfileId": {
+                        "type": "string",
+                        "description": "Reference to a Shopware App OAuth profile"
+                    },
+                    "endpoint": {
+                        "type": "string",
+                        "description": "API Endpoint to fetch data from (e.g. /api/product)"
+                    },
+                    "batchSize": {
+                        "type": "number",
+                        "default": 100
+                    }
+                },
+                "required": [
+                    "connectionProfileId",
+                    "endpoint"
+                ]
+            },
+            "capabilities": {
+                "supportsPagination": true
+            },
+            "uiHints": {}
+        },
+        {
+            "id": "storage.mongodb.raw",
+            "kind": "storage",
+            "displayName": "MongoDB Raw Storage",
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "connectionString": {
+                        "type": "string",
+                        "description": "MongoDB Connection URI"
+                    },
+                    "databaseName": {
+                        "type": "string"
+                    },
+                    "collectionName": {
+                        "type": "string",
+                        "description": "Collection to store unchanged raw data"
+                    }
+                },
+                "required": [
+                    "connectionString",
+                    "databaseName",
+                    "collectionName"
+                ]
+            },
+            "capabilities": {},
+            "uiHints": {}
+        },
+        {
+            "id": "mapper.declarative.replace",
+            "kind": "mapper",
+            "displayName": "Declarative REPLACE Mapper",
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "targetEntity": {
+                        "type": "string",
+                        "description": "Name of the target entity being built"
+                    },
+                    "mappingRulesJson": {
+                        "type": "string",
+                        "description": "JSON representation of mapping rules (priorities, fallbacks, lookups)"
+                    }
+                },
+                "required": [
+                    "targetEntity",
+                    "mappingRulesJson"
+                ]
+            },
+            "capabilities": {
+                "supportsLookups": true,
+                "supportsFallbacks": true
+            },
+            "uiHints": {}
+        },
+        {
+            "id": "target.erp.api",
+            "kind": "target",
+            "displayName": "ERP API Target",
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "endpointUrl": {
+                        "type": "string"
+                    },
+                    "apiKey": {
+                        "type": "string"
+                    },
+                    "importMode": {
+                        "type": "string",
+                        "enum": ["upsert", "insert_only", "replace"]
+                    }
+                },
+                "required": [
+                    "endpointUrl",
+                    "apiKey",
+                    "importMode"
+                ]
+            },
+            "capabilities": {},
+            "uiHints": {}
+        },
+        {
+            "id": "workflow.data_transformer",
+            "kind": "workflow",
+            "displayName": "Data Transformer Workflow",
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "sourceProfileId": {
+                        "type": "string",
+                        "description": "Reference to a Source profile (Ingestion)"
+                    },
+                    "rawStorageProfileId": {
+                        "type": "string",
+                        "description": "Reference to a Raw Storage profile"
+                    },
+                    "mapperProfileId": {
+                        "type": "string",
+                        "description": "Reference to a Declarative Mapper profile"
+                    },
+                    "targetProfileId": {
+                        "type": "string",
+                        "description": "Reference to a Target profile"
+                    },
+                    "cronSchedule": {
+                        "type": "string",
+                        "description": "Cron expression for scheduling"
+                    }
+                },
+                "required": [
+                    "sourceProfileId",
+                    "rawStorageProfileId",
+                    "mapperProfileId",
+                    "targetProfileId"
+                ]
+            },
+            "capabilities": {},
+            "uiHints": {}
+        }
+    ],
+    "compositionRules": {
+        "workflowKinds": [
+            {
+                "kind": "data_transformer_workflow",
+                "requiredRefs": [
+                    "sourceProfileId",
+                    "rawStorageProfileId",
+                    "mapperProfileId",
+                    "targetProfileId"
+                ],
+                "allowedConnectionKinds": [
+                    "source",
+                    "storage",
+                    "mapper",
+                    "target"
+                ]
+            }
+        ]
+    },
+    "uiHints": {
+        "defaults": {
+            "referenceData.defaultLimit": 100
+        },
+        "fieldSemantics": {
+            "x-secret": "Treat as secret input; never persist plaintext"
+        }
+    }
+}

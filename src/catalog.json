@@ -1,0 +1,126 @@
+{
+  "$schema": "https://a2ui.org/schema/v9/catalog.json",
+  "title": "A2UI Flow Builder Catalog",
+  "description": "Minimal and binding specification for A2UI components and actions allowed in the Flow Builder.",
+  "version": "9.0.0",
+  "allowedComponents": {
+    "Layout": [
+      "Column",
+      "Row",
+      "Card",
+      "Divider",
+      "Spacer"
+    ],
+    "Text_Display": [
+      "Text",
+      "Code",
+      "Badge",
+      "Icon"
+    ],
+    "Inputs": [
+      "TextField",
+      "TextAreaField",
+      "NumberField",
+      "Select",
+      "Checkbox"
+    ],
+    "Collections": [
+      "Table",
+      "TagList"
+    ],
+    "Flow": [
+      "Wizard",
+      "Tabs"
+    ],
+    "Actions": [
+      "Button",
+      "Form",
+      "Toast"
+    ]
+  },
+  "allowedActions": [
+    {
+      "id": "ExportSchemaBundle",
+      "description": "Exports the schema bundle."
+    },
+    {
+      "id": "LoadProject",
+      "description": "Loads an existing project configuration."
+    },
+    {
+      "id": "SaveProject",
+      "description": "Saves the current project configuration."
+    },
+    {
+      "id": "ValidateConfig",
+      "description": "Validates the current configuration against schemas."
+    },
+    {
+      "id": "ListProfiles",
+      "description": "Lists profiles of a given type.",
+      "payloadSchema": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      }
+    },
+    {
+      "id": "UpsertProfile",
+      "description": "Inserts or updates a profile."
+    },
+    {
+      "id": "DeleteProfile",
+      "description": "Deletes a profile by its ID.",
+      "payloadSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "id": "CreateProfile",
+      "description": "Creates a new profile for a plugin."
+    },
+    {
+      "id": "LoadProfile",
+      "description": "Loads an existing profile."
+    },
+    {
+      "id": "EncryptCredentials",
+      "description": "Encrypts plain text credentials.",
+      "payloadSchema": {
+        "type": "object",
+        "properties": {
+          "plaintext": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "plaintext"
+        ]
+      }
+    },
+    {
+      "id": "LoadPlugin",
+      "description": "Loads a specific plugin configuration."
+    }
+  ],
+  "validationRules": [
+    "Catalog Gate: Uknown ComponentType must be rejected, resulting in an error surface.",
+    "Schema Gate: config.json must be validated against JSON Schema.",
+    "Semantic Gate: Referential integrity, plugin constraints, and ID existence must be validated.",
+    "Action Payloads: Strict JSON. Deterministic response format: ok/err, errors[] with JSON path."
+  ]
+}

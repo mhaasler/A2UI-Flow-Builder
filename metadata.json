@@ -1,0 +1,5 @@
+{
+  "name": "A2UI Flow Builder",
+  "description": "A React renderer application for A2UI components based on the Flow Builder Catalog and Schema Bundle.",
+  "requestFramePermissions": []
+}
